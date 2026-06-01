@@ -1,13 +1,3 @@
--- KPI definitions (portfolio risk metrics).
---
--- These were previously expressed in a dbt MetricFlow semantic layer, but that
--- layer requires a time-spine model, which this dataset cannot provide (Home
--- Credit anonymizes all dates as integer day-offsets -- there are no calendar
--- dates). Rather than fake a time dimension, the canonical metric logic lives
--- here as a documented, runnable query and in the presentation marts.
---
--- Run ad hoc with:  dbt compile -s kpi_definitions   (then run the compiled SQL)
--- or just copy into the BigQuery console.
 
 with apps as (
     select * from {{ ref('fct_applications') }}
