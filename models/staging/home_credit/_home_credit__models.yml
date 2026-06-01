@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: stg_home_credit__applications
+    description: Cleaned loan applications, one row per application_id.
+    columns:
+      - name: application_id
+        tests: [unique, not_null]
+      - name: is_default
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+      - name: gender
+        tests:
+          - accepted_values: {values: ['M', 'F', 'Unknown']}
+
+  - name: stg_home_credit__bureau
+    description: Cleaned external credit records, one row per bureau_credit_id.
+    columns:
+      - name: bureau_credit_id
+        tests: [unique, not_null]
+      - name: application_id
+        tests: [not_null]
+      - name: credit_status
+        tests:
+          - accepted_values: {values: ['Active', 'Closed', 'Sold', 'Bad debt']}
+
+  - name: stg_home_credit__installments
+    description: Cleaned installment payment records on prior Home Credit loans.
+    columns:
+      - name: application_id
+        tests: [not_null]

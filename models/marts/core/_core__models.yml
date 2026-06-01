@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: dim_applicants
+    description: "Conformed applicant dimension shared by all facts. Grain: application_id."
+    columns:
+      - name: application_id
+        tests: [unique, not_null]
+      - name: age_band
+        tests:
+          - accepted_values:
+              values: ['Under 25','25-34','35-44','45-54','55-64','65+']
+      - name: income_band
+        tests: [not_null]
+
+  - name: fct_applications
+    description: "Central risk fact. Grain: one row per application_id."
+    columns:
+      - name: application_id
+        tests:
+          - unique
+          - not_null
+          - relationships: {to: ref('dim_applicants'), field: application_id}
+      - name: is_default
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+      - name: credit_to_income_ratio
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+              config:
+                where: "credit_to_income_ratio is not null"
+
+  - name: fct_bureau_credits
+    description: "External credit fact. Grain: one row per bureau credit."
+    columns:
+      - name: bureau_credit_id
+        tests: [unique, not_null]
+      - name: application_id
+        description: FK to dim_applicants (scoped to modeled applicants).
+        tests:
+          - not_null
+          - relationships: {to: ref('dim_applicants'), field: application_id}
+
+  - name: fct_installments
+    description: "Prior-loan payment fact. Grain: one installment record (no unique natural key)."
+    columns:
+      - name: application_id
+        description: FK to dim_applicants (scoped to modeled applicants).
+        tests:
+          - not_null
+          - relationships: {to: ref('dim_applicants'), field: application_id}
+      - name: delinquency_bucket
+        tests:
+          - accepted_values:
+              values: ['No payment recorded','On time / Early','1-30 DPD','31-60 DPD','61-90 DPD','90+ DPD']

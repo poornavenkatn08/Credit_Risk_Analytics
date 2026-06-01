@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: mart_default_by_segment
+    description: Default rate by income band x education.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [income_band, education]
+  - name: mart_portfolio_exposure
+    description: Exposure, ticket size and default rate by contract type x income band.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [contract_type, income_band]
+  - name: mart_credit_history_risk
+    description: Default rate by historical late-payment band.
+    columns:
+      - name: late_payment_band
+        tests: [unique, not_null]

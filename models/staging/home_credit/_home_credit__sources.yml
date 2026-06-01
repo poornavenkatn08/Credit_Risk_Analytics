@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: home_credit_raw
+    description: >
+      Raw Home Credit Default Risk data (Kaggle competition) loaded as-is into
+      BigQuery. The core build uses three of the source tables: application_train
+      (the modeled loans + outcome), bureau (external credit history), and
+      installments_payments (payment behavior on prior Home Credit loans).
+      All dates in this dataset are anonymized as integer DAY OFFSETS relative to
+      each application (negative = in the past); there are no calendar dates.
+    database: "{{ env_var('DBT_RAW_PROJECT', target.project) }}"
+    schema: home_credit_raw
+    tables:
+      - name: application_train
+        description: One row per loan application. TARGET=1 => payment difficulties (default).
+        columns:
+          - name: SK_ID_CURR
+            tests: [unique, not_null]
+      - name: bureau
+        description: One row per external credit reported to the credit bureau. Many per applicant.
+        columns:
+          - name: SK_ID_BUREAU
+            tests: [unique, not_null]
+      - name: installments_payments
+        description: One row per installment payment on the applicant's prior Home Credit loans.

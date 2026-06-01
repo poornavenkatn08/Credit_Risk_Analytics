@@ -1,0 +1,17 @@
+target/
+dbt_packages/
+logs/
+.env
+profiles.yml
+data/
+tableau/data/
+*.csv
+.venv/
+*.pyc
+*.twb
+*.twbx
+.DS_Store
+.vscode/
+.idea/
+*keyfile*.json
+*service-account*.json
